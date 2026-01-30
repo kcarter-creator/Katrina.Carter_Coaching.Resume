@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katrina Carter - Coaching Experience Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .web-container {
+            position: relative;
+            width: 100%;
+            height: 800px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .node {
+            position: absolute;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 0.9em;
+            text-align: center;
+            max-width: 200px;
+        }
+        
+        .node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+            z-index: 1100;
+        }
+        
+        .node.center {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #001f3f;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 25px 30px;
+            max-width: 250px;
+        }
+        
+        .node.experience {
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .node.skill {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            color: #001f3f;
+            font-weight: 500;
+        }
+        
+        .node.active {
+            animation: pulse 1.5s infinite;
+            z-index: 1100;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .connection-info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.98);
+            padding: 25px 35px;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            max-width: 650px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 2000;
+            border: 3px solid #FFD700;
+        }
+        
+        .connection-info.visible {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(-50%) scale(1.02);
+        }
+        
+        .connection-info h3 {
+            color: #FFA500;
+            margin-bottom: 10px;
+        }
+        
+        .connection-info p {
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .legend {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .instructions {
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Katrina Carter</h1>
+        <p class="subtitle">Professional Experience Web - Head Coach Competencies</p>
+        
+        <div class="web-container" id="webContainer">
+            <canvas id="connectionCanvas"></canvas>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);"></div>
+                    <span>Core Role</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);"></div>
+                    <span>Experiences</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%); border: 1px solid #ccc;"></div>
+                    <span>Transferable Skills</span>
+                </div>
+            </div>
+            
+            <div class="connection-info" id="connectionInfo">
+                <h3 id="infoTitle">Click on any node</h3>
+                <p id="infoText">Explore how each experience connects to head coaching excellence</p>
+            </div>
+        </div>
+        
+        <p class="instructions">💡 Click on any node to see how it enhances head coaching capabilities</p>
+    </div>
+
+    <script>
+        const nodes = [
+            {
+                id: 'center',
+                text: 'HEAD COACH Excellence',
+                type: 'center',
+                x: 50,
+                y: 50,
+                info: 'A comprehensive leadership role built on diverse experiences in coaching, management, athletics, and education.'
+            },
+            {
+                id: 'cal-assistant',
+                text: 'Cal Berkeley Assistant Coach',
+                type: 'experience',
+                x: 75,
+                y: 25,
+                info: 'Tactical development, video analysis, recruitment coordination, and team logistics build comprehensive coaching expertise.',
+                skills: ['Tactical Strategy', 'Video Analysis', 'Recruitment', 'Travel Logistics', 'Data Analytics']
+            },
+            {
+                id: 'restaurant',
+                text: 'Restaurant Manager',
+                type: 'experience',
+                x: 85,
+                y: 55,
+                info: 'Managing teams, maintaining standards under pressure, inventory control, and staff training translate directly to team management and program operations.',
+                skills: ['Team Management', 'High-Pressure Decision Making', 'Training & Onboarding', 'Budget Management']
+            },
+            {
+                id: 'usa-selector',
+                text: 'USA Field Hockey Selector',
+                type: 'experience',
+                x: 75,
+                y: 80,
+                info: 'Talent identification, player development, and curriculum design at the national level provide elite-level coaching perspective.',
+                skills: ['Talent Identification', 'Player Development', 'Curriculum Design', 'Performance Analysis']
+            },
+            {
+                id: 'resilience',
+                text: 'California Resilience Co-Founder',
+                type: 'experience',
+                x: 50,
+                y: 90,
+                info: 'Building a program from scratch demonstrates entrepreneurship, vision, and ability to create sustainable coaching systems.',
+                skills: ['Program Development', 'Business Management', 'Staff Coordination', 'Strategic Planning']
+            },
+            {
+                id: 'aau',
+                text: 'AAU Junior Olympics Coach',
+                type: 'experience',
+                x: 25,
+                y: 80,
+                info: 'Tournament coaching, team culture development, and high-pressure competition management enhance game-day leadership.',
+                skills: ['Tournament Strategy', 'Team Culture', 'Competitive Environment', 'Player Motivation']
+            },
+            {
+                id: 'presentation',
+                text: 'Presentation HS Coach',
+                type: 'experience',
+                x: 15,
+                y: 55,
+                info: 'High school coaching during COVID demonstrates adaptability, athlete development focus, and positive coaching methodology.',
+                skills: ['Adaptability', 'Crisis Management', 'Athlete-Centered Coaching', 'Skill Development']
+            },
+            {
+                id: 'camps',
+                text: 'Summer Camp Coach',
+                type: 'experience',
+                x: 25,
+                y: 25,
+                info: 'Working with varied curricula and diverse coaching staffs builds collaboration skills and coaching flexibility.',
+                skills: ['Curriculum Adaptation', 'Mentorship', 'Collaboration', 'Teaching Fundamentals']
+            },
+            {
+                id: 'athlete',
+                text: 'USA National Team Athlete',
+                type: 'experience',
+                x: 50,
+                y: 10,
+                info: 'Elite playing experience provides authentic understanding of athlete perspective and high-performance environments.',
+                skills: ['Elite Performance Insight', 'Mental Toughness', 'Athlete Empathy', 'Competition Experience']
+            },
+            {
+                id: 'marine-science',
+                text: 'Marine Science Degree',
+                type: 'skill',
+                x: 10,
+                y: 35,
+                info: 'Scientific thinking, research methodology, and analytical skills enhance data-driven coaching decisions.',
+                skills: ['Analytical Thinking', 'Research Skills', 'Systems Thinking', 'Environmental Awareness']
+            },
+            {
+                id: 'catapult',
+                text: 'Data Analytics',
+                type: 'skill',
+                x: 90,
+                y: 35,
+                info: 'Catapult, video analysis, and performance metrics optimize player development and injury prevention.',
+                skills: ['Performance Metrics', 'Injury Prevention', 'Evidence-Based Coaching']
+            },
+            {
+                id: 'communication',
+                text: 'Multilingual Communication',
+                type: 'skill',
+                x: 90,
+                y: 70,
+                info: 'English, French, and Spanish enable recruitment of international talent and diverse team communication.',
+                skills: ['International Recruitment', 'Cultural Competency', 'Inclusive Environment']
+            },
+            {
+                id: 'certifications',
+                text: 'Level III Certified',
+                type: 'skill',
+                x: 10,
+                y: 70,
+                info: 'Highest USA Field Hockey certification demonstrates commitment to professional development and coaching excellence.',
+                skills: ['Advanced Tactics', 'Coaching Education', 'Best Practices', 'Continuous Learning']
+            }
+        ];
+
+        const connections = {
+            'center': ['cal-assistant', 'restaurant', 'usa-selector', 'resilience', 'aau', 'presentation', 'camps', 'athlete', 'marine-science', 'catapult', 'communication', 'certifications'],
+            'cal-assistant': ['catapult', 'communication'],
+            'restaurant': ['resilience'],
+            'usa-selector': ['certifications', 'athlete'],
+            'resilience': ['aau'],
+            'presentation': ['certifications'],
+            'camps': ['certifications'],
+            'athlete': ['aau'],
+            'marine-science': ['catapult']
+        };
+
+        const container = document.getElementById('webContainer');
+        const canvas = document.getElementById('connectionCanvas');
+        const ctx = canvas.getContext('2d');
+        const infoBox = document.getElementById('connectionInfo');
+        const infoTitle = document.getElementById('infoTitle');
+        const infoText = document.getElementById('infoText');
+
+        let activeNode = null;
+
+        function resizeCanvas() {
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            drawConnections();
+        }
+
+        function drawConnections() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerNode = nodes.find(n => n.id === 'center');
+            const centerX = (centerNode.x / 100) * canvas.width;
+            const centerY = (centerNode.y / 100) * canvas.height;
+
+            nodes.forEach(node => {
+                if (node.id === 'center') return;
+                
+                const nodeX = (node.x / 100) * canvas.width;
+                const nodeY = (node.y / 100) * canvas.height;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(nodeX, nodeY);
+                
+                if (activeNode && (activeNode.id === node.id || connections[activeNode.id]?.includes(node.id) || connections[node.id]?.includes(activeNode.id))) {
+                    ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
+                    ctx.lineWidth = 3;
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.lineWidth = 1.5;
+                }
+                
+                ctx.stroke();
+            });
+
+            if (activeNode && connections[activeNode.id]) {
+                connections[activeNode.id].forEach(connId => {
+                    const connNode = nodes.find(n => n.id === connId);
+                    if (connNode && connNode.id !== 'center') {
+                        const node1X = (activeNode.x / 100) * canvas.width;
+                        const node1Y = (activeNode.y / 100) * canvas.height;
+                        const node2X = (connNode.x / 100) * canvas.width;
+                        const node2Y = (connNode.y / 100) * canvas.height;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(node1X, node1Y);
+                        ctx.lineTo(node2X, node2Y);
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+            }
+        }
+
+        nodes.forEach(node => {
+            const nodeEl = document.createElement('div');
+            nodeEl.className = `node ${node.type}`;
+            nodeEl.textContent = node.text;
+            nodeEl.style.left = `${node.x}%`;
+            nodeEl.style.top = `${node.y}%`;
+            nodeEl.style.transform = 'translate(-50%, -50%)';
+            
+            nodeEl.addEventListener('click', () => {
+                if (activeNode) {
+                    document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+                }
+                
+                activeNode = node;
+                nodeEl.classList.add('active');
+                
+                infoTitle.textContent = node.text;
+                infoText.textContent = node.info;
+                
+                if (node.skills) {
+                    infoText.textContent += '\n\nKey Skills: ' + node.skills.join(', ');
+                }
+                
+                infoBox.classList.add('visible');
+                drawConnections();
+            });
+            
+            container.appendChild(nodeEl);
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        container.addEventListener('click', (e) => {
+            if (e.target === container || e.target === canvas) {
+                activeNode = null;
+                document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+                infoBox.classList.remove('visible');
+                drawConnections();
+            }
+        });
+    </script>
+</body>
+</html>
